@@ -8,8 +8,8 @@ function Player:new(world,x,y)
   local g = anim.newGrid(32,32,self.img:getWidth(),self.img:getHeight())
   self.animation = {
       anim.newAnimation(g('1-1',1),0.1),
-      anim.newAnimation(g('1-4',1),0.1),
-      anim.newAnimation(g('5-5',1),0.1)
+      anim.newAnimation(g('2-9',1),0.1),
+      anim.newAnimation(g('7-7',1),0.1)
     }
 
   self.w=32
@@ -29,15 +29,21 @@ function Player:new(world,x,y)
 
   self.state = 'idle'
 	self.world:add(self,self:getRect())
+
+  self.type="Player"
+  self.collisionFilter = function(item,other)
+    local x,y,w,h = self.world:getRect(other)
+    if other.properties then
+      if other.properties.collidable then
+        return 'slide'
+      end
+    end
+    if other.type == "Weapon" then
+      return 'cross'
+    end
+  end
 end
 
-function Player:collisionFilter(other)
-	local x,y,w,h = self.world:getRect(other)
-
-	if other.isGround then
-		return 'slide'
-	end
-end
 
 function Player:update(dt)
 	local goalx=self.x
@@ -60,16 +66,14 @@ function Player:update(dt)
 	local len = 0
   local tempx = self.x
   local tempy = self.y
-  self.x, self.y, cols, len = self.world:move(self,goalx,goaly,collisionFilter)
+  self.x, self.y, cols, len = self.world:move(self,goalx,goaly,self.collisionFilter)
   if self.y ~= goaly then
     self.vy=0
   end
   
   
   for i, col in ipairs(cols) do
-		if col.other.isEnemy then
-			--removeEnemy()
-		end
+
 	end
   
   self.animation[self.animc]:update(dt)
@@ -127,6 +131,7 @@ end
 function Player:draw()
 	--love.graphics.draw(self.img,self.x,self.y)
   self.animation[self.animc]:draw(self.img, self.x, self.y)
+  
 end
 
 return Player

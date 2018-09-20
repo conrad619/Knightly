@@ -12,9 +12,11 @@ local LevelBase = require 'gamestates.LevelBase'
 local gameLevel1 = LevelBase:extend()
 
 local Player = require 'objects.Player'
+local Weapon = require 'objects.Weapon'
 local Ground = require 'objects.Ground'
 
 player=nil
+weapon=nil
 --world =nil
 
 function gameLevel1:new()
@@ -24,7 +26,9 @@ end
 
 function gameLevel1:enter()
 	player = Player(self.world, 32, 32)
+  weapon = Weapon(self.world, player)
   self.Entities:add(player)
+  self.Entities:add(weapon)
 end
 
 function gameLevel1:update(dt)

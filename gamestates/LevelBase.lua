@@ -14,7 +14,6 @@ function LevelBase:new(mapFile)
   self.map:resize(love.graphics.getWidth(), love.graphics.getHeight())
   
   self.map:bump_init(self.world)
-  
   Entities:enter()
   self.Entities = Entities
   self.camera = camera
