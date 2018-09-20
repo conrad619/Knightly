@@ -13,12 +13,10 @@ local gameLevel1 = LevelBase:extend()
 
 local Player = require 'objects.Player'
 local Weapon = require 'objects.Weapon'
-local Enemy = require 'objects.Enemy'
 local Ground = require 'objects.Ground'
 
 player=nil
 weapon=nil
-enemy=nil
 --world =nil
 
 function gameLevel1:new()
@@ -29,11 +27,8 @@ end
 function gameLevel1:enter()
 	player = Player(self.world, 32, 32)
   weapon = Weapon(self.world, player)
-  enemy = Enemy(self.world, 32*5, 32*8, player)
   self.Entities:add(player)
   self.Entities:add(weapon)
-  self.Entities:add(weapon.hitbox)
-  self.Entities:add(enemy)
 end
 
 function gameLevel1:update(dt)
@@ -50,10 +45,6 @@ function gameLevel1:draw()
   self.Entities:draw()
   
   camera:unset()
-end
-
-function gameLevel1:keypressed(key)
-  weapon:keypressed(key)
 end
 
 return gameLevel1
