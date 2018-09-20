@@ -1,20 +1,18 @@
 Entity = require 'objects.Entity'
 local anim = require 'libs.anim8'
 local Weapon = Entity:extend()
-local HitBox = require 'objects.HitBox'
 
 function Weapon:new(world,parent)
 	self.img = love.graphics.newImage('images/sword.png')
 
 	self.w=32
 	self.h=32
-	self.parent=parent
-	Weapon.super.new(self,world,parent.x,parent.y,self.w,self.h)
+	self.parent=player
+	Weapon.super.new(self,world,player.x,player.y,self.w,self.h)
 	self.offsetx=16
 	self.offsety=-8
 	self.flipped=false
 	self.type="Weapon"
-
 	self.world:add(self,self:getRect())
 	self.collisionFilter=function(item,other)
 	local x,y,w,h = self.world:getRect(other)
@@ -28,9 +26,6 @@ function Weapon:new(world,parent)
 
 	   	return nil
 	end
-
-	self.hitbox = HitBox(self.world,parent)
-
 end
 
 
@@ -38,6 +33,9 @@ end
 function Weapon:update(dt)
 	local goalx=self.x
 	local goaly=self.y
+	if love.keypressed == 'z' and self.vy==0 then
+		
+	end
 
 	if self.parent.flipped then
 		goalx = self.parent.x + -self.offsetx
@@ -54,14 +52,6 @@ function Weapon:update(dt)
 
   	end
 end
-
-function Weapon:keypressed(key)
-	if key == 'z' then
-		print("pressing")
-		self.hitbox:setActive(true)
-	end
-end
-
 
 
 function Weapon:draw()

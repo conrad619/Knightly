@@ -12,7 +12,6 @@ function love.load()
 end
 
 function love.keypressed(key)
-	Gamestate.current().keypressed(key)
   if key == "escape" then
     love.event.push("quit")
   end
