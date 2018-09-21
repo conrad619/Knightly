@@ -1,21 +1,25 @@
 --Player
-Entity = require 'objects.Entity'
-local anim = require 'libs.anim8'
+local Entity = OBJECTS.entity
+local anim = LIBS.anim
 local Player = Entity:extend()
-
 function Player:new(world,x,y)
-	self.img = love.graphics.newImage('images/player.png')
-  local g = anim.newGrid(32,32,self.img:getWidth(),self.img:getHeight())
-  self.animation = {
-      anim.newAnimation(g('1-1',1),0.1),
-      anim.newAnimation(g('2-9',1),0.1),
-      anim.newAnimation(g('7-7',1),0.1)
-    }
+	self.img = IMG.player
+  self.animation = {}
+  self.load = function()
+    local g = anim.newGrid(32,32,self.img:getWidth(),self.img:getHeight())
+    self.animation = {
+        anim.newAnimation(g('1-1',1),0.1),
+        anim.newAnimation(g('2-9',1),0.1),
+        anim.newAnimation(g('7-7',1),0.1)
+      }
+  end
+  self.loaded=false
 
   self.w=32
   self.h=32
 	Player.super.new(self,world,x,y,self.w,self.h)
-
+  self.originx=-16
+  self.originy=-16
 	self.vx=0
 	self.vy=0
 	self.speed=100
@@ -26,6 +30,8 @@ function Player:new(world,x,y)
   
   self.animc=1
   self.flipped=false
+  self.canMove=true
+  self.canFlip=true
 
   self.state = 'idle'
 	self.world:add(self,self:getRect())
@@ -46,21 +52,28 @@ end
 
 
 function Player:update(dt)
+  if LDR.finishedLoading then
+    if not loaded then
+        self.load()
+      loaded=true
+    end
 	local goalx=self.x
 	local goaly=self.y
   
-	if love.keyboard.isDown('left') then
-		goalx=self.x-self.speed*dt
-	elseif love.keyboard.isDown('right') then
-		goalx=self.x+self.speed*dt
-	end
+  if self.canMove or self.state=="jumping" then
+  	if love.keyboard.isDown('left') then
+  		goalx=goalx-self.speed*dt
+  	elseif love.keyboard.isDown('right') then
+  		goalx=goalx+self.speed*dt
+  	end
 
-	if love.keyboard.isDown('space') and self.vy==0 then
-		self.vy = -self.jumpSpeed
-	end
+  	if love.keyboard.isDown('space') and self.vy==0 then
+  		self.vy = -self.jumpSpeed
+  	end
+  end
   
   self.vy = self.vy + self.gravity * dt --gravity
-	goaly = self.y + self.vy * dt
+	goaly = goaly + self.vy * dt
   
 	local cols = {}
 	local len = 0
@@ -77,7 +90,6 @@ function Player:update(dt)
 	end
   
   self.animation[self.animc]:update(dt)
-  
   if tempx > self.x then
     self.state = 'moveLeft'
     self:faceLeft()
@@ -93,7 +105,11 @@ function Player:update(dt)
   end
   
   self:State()
+
+  
+  end
 end
+
 
 function Player:State()
   if self.state == 'moveLeft' then
@@ -110,7 +126,7 @@ function Player:State()
 end
 
 function Player:faceLeft()
-  if self.flipped == false then
+  if self.flipped == false and self.canFlip then
     for i,a in ipairs(self.animation) do
       a:flipH()
     end
@@ -120,7 +136,7 @@ function Player:faceLeft()
 end
 
 function Player:faceRight()
-  if self.flipped == true then
+  if self.flipped == true and self.canFlip then
     for i,a in ipairs(self.animation) do
       a:flipH()
     end
@@ -130,7 +146,11 @@ end
 
 function Player:draw()
 	--love.graphics.draw(self.img,self.x,self.y)
-  self.animation[self.animc]:draw(self.img, self.x, self.y)
+  if LDR.finishedLoading then
+    self.animation[self.animc]:draw(self.img, self.x, self.y)
+    love.graphics.rectangle("line",self.x,self.y,self.w,self.h)
+    love.graphics.rectangle("line",self.x,self.y,self.w-30,self.h-30)
+  end
   
 end
 
