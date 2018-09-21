@@ -1,9 +1,9 @@
-local bump = require 'libs.bump'
-local Gamestate = require 'libs.gamestate'
-local Object = require 'libs.classic'
-local sti = require 'libs.sti'
-local Entities = require 'objects.Entities'
-local camera = require 'libs.camera'
+local bump = LIBS.bump
+local Gamestate = LIBS.gamestate
+local Object = LIBS.classic
+local sti = LIBS.sti
+local Entities = OBJECTS.entities
+local camera = LIBS.camera
 
 local LevelBase = Object:extend()
 LevelBase:implement(Gamestate)
