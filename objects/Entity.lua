@@ -1,5 +1,5 @@
 --Entity
-local Object = require 'libs.classic'
+local Object = LIBS.classic
 local Entity = Object:extend()
 
 function Entity:new(world,x,y,w,h)
