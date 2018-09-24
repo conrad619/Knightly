@@ -1,9 +1,9 @@
-local bump = require 'libs.bump'
-local Gamestate = require 'libs.gamestate'
-local Object = require 'libs.classic'
-local sti = require 'libs.sti'
-local Entities = require 'objects.Entities'
-local camera = require 'libs.camera'
+local bump = LIBS.bump
+local Gamestate = LIBS.gamestate
+local Object = LIBS.classic
+local sti = LIBS.sti
+local Entities = OBJECTS.entities
+local camera = LIBS.camera
 
 local LevelBase = Object:extend()
 LevelBase:implement(Gamestate)
@@ -25,6 +25,7 @@ function LevelBase:keypressed(key)
   end
 end
 
+
 function LevelBase:positionCamera(player,camera)
   local mapWidth = self.map.width * self.map.tilewidth
   local halfScreen = love.graphics.getWidth() / 2
@@ -34,7 +35,7 @@ function LevelBase:positionCamera(player,camera)
   else
     boundX = math.min(player.x - halfScreen, mapWidth - love.graphics.getWidth())
   end
-  camera:setPosition(boundX,0)
+  camera:setPosition(boundX,boundY)
 end
 
 return LevelBase

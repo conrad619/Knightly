@@ -1,5 +1,5 @@
 --Ground
-Entity = require 'objects.Entity'
+local Entity = OBJECTS.entity
 local Ground = Entity:extend()
 
 function Ground:new(world,x,y,w,h)

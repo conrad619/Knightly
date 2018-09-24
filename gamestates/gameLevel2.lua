@@ -1,12 +1,12 @@
---gameLevel1
+--gameLevel2
 
 local LevelBase = require 'gamestates.LevelBase'
 
 --local Entities = require 'objects.Entities'
 --local Entity = require 'objects.Entity'
 
---local gameLevel1 = Gamestate.new()
-local gameLevel1 = LevelBase:extend()
+--local gameLevel2 = Gamestate.new()
+local gameLevel2 = LevelBase:extend()
 
 local Player = require 'objects.Player'
 local Weapon = require 'objects.Weapon'
@@ -16,23 +16,22 @@ local Ground = require 'objects.Ground'
 local player=nil
 local weapon=nil
 local enemy=nil
---world =nil
-local portal = {x=320,y=352,w=32,h=32}
+
 ENTITIES={}
 
-function gameLevel1:new()
-    gameLevel1.super.new(self,'levels/level_1.lua')
+function gameLevel2:new()
+    gameLevel2.super.new(self,'levels/level_2.lua')
     
 end
 
-function gameLevel1:enter()
+function gameLevel2:enter()
 	player = Player(self.world, 32, 32)
   weapon = Weapon(self.world, player)
   enemy = Enemy(self.world, 32*5, 32*8, player)
-  self.Entities:add(enemy)
   self.Entities:add(player)
-  self.Entities:add(weapon.hitbox)
   self.Entities:add(weapon)
+  self.Entities:add(weapon.hitbox)
+  self.Entities:add(enemy)
   ENTITIES = self.Entities
 
   --[[for i=0, 10,1 do ------------------create 25 enemies
@@ -41,16 +40,10 @@ function gameLevel1:enter()
   end--]]
 end
 
-function gameLevel1:update(dt)
+function gameLevel2:update(dt)
   if LDR.finishedLoading then
-    if player.originx > portal.x then
-      self.Entities:clear()
-      --if self.Entities:length() == 0 then
-        return Gamestate.switch(LEVELS.GameLevel2.level())
-      --end
-    end
-     -- print(c)
   	self.map:update(dt)
+      print(table.getn(self.Entities.entityList))
     --[[
     for i, e in ipairs(self.Entities.entityList) do
       if e.health then
@@ -66,7 +59,7 @@ function gameLevel1:update(dt)
   end
 end
 
-function gameLevel1:draw()
+function gameLevel2:draw()
   if LDR.finishedLoading then
   	camera:set()
     
@@ -74,15 +67,12 @@ function gameLevel1:draw()
     self.Entities:draw()
     
     camera:unset()
-
-    love.graphics.rectangle("fill",portal.x,portal.y,portal.w,portal.h)
   end
 end
 
+function gameLevel2:keypressed(key)
 
-function gameLevel1:keypressed(key)
-
-  gameLevel1.super:keypressed(key)
+  gameLevel2.super:keypressed(key)
   if key == 'x' then
 
     local x,y = love.mouse.getPosition()
@@ -95,8 +85,8 @@ function gameLevel1:keypressed(key)
   weapon:keypressed(key)
 end
 
-function gameLevel1:keyreleased(key)
+function gameLevel2:keyreleased(key)
   weapon:keyreleased(key)
 end
 
-return gameLevel1
+return gameLevel2
