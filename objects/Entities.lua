@@ -25,6 +25,7 @@ function Entities:remove(entity)
 	for i, e in ipairs(self.entityList) do
 		if e == entity then
 			table.remove(self.entityList, i)
+			e.world:remove(e)
 			return
 		end
 	end
@@ -35,20 +36,33 @@ function Entities:removeAt(index)
 end
 
 function Entities:clear()
+	for i=1, #self.entityList do
+		self.entityList[i] = nil
+	end
 	self.world=nil
 	self.entities={}
+
 end
 
 function Entities:draw()
-	for i, e in ipairs(self.entityList) do
-		e:draw(i)
+	if LDR.finishedLoading then
+		for i, e in ipairs(self.entityList) do
+			e:draw(i)
+		end
 	end
 end
 
 function Entities:update(dt)
-	for i, e in ipairs(self.entityList) do
-		e:update(dt, i)
+	if LDR.finishedLoading then
+		for i, e in ipairs(self.entityList) do
+			e:update(dt, i)
+		end
 	end
 end
+
+function Entities:length()
+	return table.getn(self.entityList)
+end
+
 
 return Entities
