@@ -22,7 +22,8 @@ Gamestate = LIBS.gamestate
 
 LEVELS = {
 	GameLevel1 = {level=require 'gamestates.gameLevel1',loaded=false},
-	GameLevel2 = {level=require 'gamestates.gameLevel2',loaded=false}
+	GameLevel2 = {level=require 'gamestates.gameLevel2',loaded=false},
+	GameLevel3 = {level=require 'gamestates.gameLevel3',loaded=false}
 }
 
 GAMELEVEL = 1
@@ -44,7 +45,11 @@ function love.load()
 	LDR.newImage(IMG,'player','images/player.png')
 	LDR.newImage(IMG,'enemy','images/enemy.png')
 	LDR.newImage(IMG,'sword','images/sword.png')
+	LDR.newImage(IMG,'bow','images/bow.png')
+	LDR.newImage(IMG,'arrow','images/arrow.png')
 	LDR.newImage(IMG,'gate','images/gate.png')
+	LDR.newImage(IMG,'spike','images/spike.png')
+	LDR.newImage(IMG,'void','images/void.png')
 	LDR.start(function()
     LDR.finishedLoading = true
   end)
@@ -64,7 +69,7 @@ function love.update(dt)
 		LDR.update()
 	elseif not loaded then
 		loaded=true
-		local gameLevel1 = LEVELS.GameLevel1.level()
+		local gameLevel1 = LEVELS.GameLevel3.level()
 		Gamestate.registerEvents()
 		Gamestate.switch(gameLevel1)
 		LEVELS.GameLevel1.loaded=true

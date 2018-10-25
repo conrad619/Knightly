@@ -7,12 +7,15 @@ local gameLevel1 = LevelBase:extend()
 local Player = require 'objects.Player'
 local Enemy = require 'objects.Enemy'
 local Gate = require 'objects.Gate'
+local Trap = require 'objects.Trap'
 
 local player=nil
 local gate=nil
+local gate2=nil
 local weapon=nil
 local enemy=nil
 local px,py,load=false
+local respawn = {x=0,y=0}
 ENTITIES={}
 
 function gameLevel1:new()
@@ -23,7 +26,8 @@ end
 function gameLevel1:enter()
 
   if PLAYER.player == nil then
-      player = Player(self.world, 0,0)
+    player = Player(self.world, 0,0,1)
+
     --PLAYER.player = player
   else
     player = PLAYER.player
@@ -40,20 +44,30 @@ function gameLevel1:enter()
       player.world:update(player,p.x,p.y)
       player.x=p.x
       player.y=p.y
-      self.Entities:addMany(player:components())
+      player.checkPoint = {p.x,p.y}
+      self.Entities:add(player)
     elseif p.name == "spawn_enemy" then
-      enemy = Enemy(self.world, p.x,p.y, player)
-      self.Entities:addMany(enemy:components())
+      enemy = Enemy(self.world, p.x,p.y, player,love.math.random(1,2))
+      self.Entities:add(enemy)
     elseif p.name == "door_level_2" then
       gate = Gate(self.world,p.x,p.y)
       self.Entities:add(gate)  
     elseif p.name == "door_level_dummy" then
-      local gate = Gate(self.world,p.x,p.y)
-      gate.active=false
-      self.Entities:add(gate)
+      gate2 = Gate(self.world,p.x,p.y)
+      gate2.active=false
+      self.Entities:add(gate2)
     end
+      
 
 
+  end
+
+  for i, p in ipairs(self.map.layers.traps.objects) do
+
+    if p.name == "spike" then
+        local spike = Trap(self.world,p.x,p.y,p.name)
+        self.Entities:add(spike)  
+    end 
   end
 
   ENTITIES = self.Entities
@@ -105,7 +119,7 @@ function gameLevel1:keypressed(key)
     x = math.floor(x/32)*32
     y = math.floor(y/32)*32
     enemy = Enemy(self.world, x, y, player)
-    self.Entities:addMany(enemy:components())
+    self.Entities:add(enemy)
   end
 
   player:keypressed(key)

@@ -2,38 +2,85 @@ local Entity = OBJECTS.entity
 local anim = LIBS.anim
 local Weapon = Entity:extend()
 local HitBox = require 'objects.HitBox'
+local Arrow = require 'objects.Arrow'
 local loaded = false
-function Weapon:new(world,parent)
-	self.img = IMG.sword
+function Weapon:new(world,parent,wep)
   	self.animation = {}
-	self.load = function()
-		local g = anim.newGrid(64,48,self.img:getWidth(),self.img:getHeight())
+	
+	self.wep = wep
 
-		self.animation = {
-	      ["idle"]=anim.newAnimation(g('1-1',1),0.1),
-	      ["ready"]=anim.newAnimation(g('1-4',1),0.05,function() 
-	      	self.animc="hit"
-			self.hitbox:setActive(true)
-	      	end),
-	      ["hit"]=anim.newAnimation(g('5-6',1),0.05, function() 
-	      	self.animc="rest" 	      	
-	      	self.hitbox:setActive(false) 
-	      	self.isAttacking = false
-	      	end),
-	      ["rest"]=anim.newAnimation(g('7-7',1),0.05,function()
-	      	self.animc="idle"
-	      	self.parent.canMove=true
-			self.parent.canFlip=true
-	      	end)
-	    }
-	end
+	self.switch = {function()
+			self.w=64
+			self.h=48
+			self.offsetx=32
+			self.offsety=32
+			self.offx=16
+			self.offy=0
+			self.range=32*2
+			self.rangeChase=32*4
 
-	self.w=64
-	self.h=64
+			self.img = IMG.sword
+			self.load = function()
+				local g = anim.newGrid(64,48,self.img:getWidth(),self.img:getHeight())
+
+				self.animation = {
+			      ["idle"]=anim.newAnimation(g('1-1',1),0.1),
+			      ["ready"]=anim.newAnimation(g('1-4',1),0.05,function() 
+			      	self.animc="hit"
+					self.hitbox:setActive(true)
+			      	end),
+			      ["hit"]=anim.newAnimation(g('5-6',1),0.05, function() 
+			      	self.animc="rest" 	      	
+			      	self.hitbox:setActive(false) 
+			      	self.isAttacking = false
+			      	end),
+			      ["rest"]=anim.newAnimation(g('7-7',1),0.05,function()
+			      	self.animc="idle"
+			      	self.parent.canMove=true
+					self.parent.canFlip=true
+			      	end)
+			    }
+			end
+		end
+
+		,function()
+			self.w=64
+			self.h=32
+			self.offsetx=32
+			self.offsety=16
+			self.offx=16
+			self.offy=0
+			self.range=32*5
+			self.rangeChase=32
+
+			self.img = IMG.bow
+			self.load = function()
+				local g = anim.newGrid(64,32,self.img:getWidth(),self.img:getHeight())
+
+				self.animation = {
+			      ["idle"]=anim.newAnimation(g('1-1',1),0.1),
+			      ["ready"]=anim.newAnimation(g('1-5',1),0.1,function() 
+			      	self.animc="fire"
+
+			      	local arrow = Arrow(self.world,self.x,self.y,self.flipped,self.parent.enemy)
+
+			      	end),
+			      ["fire"]=anim.newAnimation(g('1-1',1),0.05, function() 
+			      	self.animc="idle"
+			      	self.isAttacking = false
+			      	self.parent.canMove=true
+					self.parent.canFlip=true
+			      	end)
+			    }
+			end
+		end
+		}
+	
+	self.switch[self.wep]()
+
+
 	self.parent=parent
 	Weapon.super.new(self,world,parent.x,parent.y,self.w,self.h)
-	self.offsetx=32
-	self.offsety=32
 	self.flipped=false
 	self.type="Weapon"
 	self.animc="idle"
@@ -86,9 +133,9 @@ function Weapon:update(dt)
 
 
 	if self.flipped then
-		goalx = goalx - 16
+		goalx = goalx - self.offx
 	else
-		goalx = goalx + 16
+		goalx = goalx + self.offx
 	end
 
 
@@ -97,8 +144,8 @@ function Weapon:update(dt)
 
   	self.animation[self.animc]:update(dt)
 
-  	self.originx = self.x+self.offsetx
-  	self.originy = self.y+self.offsety
+  	self.originx = self.x
+  	self.originy = self.y
 
 end
 
@@ -111,7 +158,7 @@ function Weapon:attack(key)
 end
 
 function Weapon:draw()
-	--love.graphics.rectangle("line",self.x,self.y,3,64)
+	--love.graphics.rectangle("line",self.x,self.y,3,3)
   	self.animation[self.animc]:draw(self.img, self.x, self.y,0,1,1,self.offsetx,self.offsety)
 end
 

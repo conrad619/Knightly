@@ -16,8 +16,10 @@ function Gate:new(world,x,y)
 
 	self.filter = function(item,other) 
 		          	if other.type=="Player" and self.active then 
-		              self.proceed=true 
-		              return 'cross'
+		              	self.proceed=true 
+		              	return 'cross'
+		            elseif other.type == "Enemy" then
+						return 'cross'
 		            end 
 		          end
 

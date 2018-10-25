@@ -8,7 +8,7 @@ return {
   height = 26,
   tilewidth = 32,
   tileheight = 32,
-  nextobjectid = 37,
+  nextobjectid = 42,
   properties = {},
   tilesets = {
     {
@@ -264,8 +264,8 @@ return {
     {
       type = "objectgroup",
       name = "entities",
-      visible = true,
-      opacity = 0,
+      visible = false,
+      opacity = 1,
       offsetx = 0,
       offsety = 0,
       draworder = "topdown",
@@ -283,7 +283,6 @@ return {
           rotation = 0,
           visible = true,
           properties = {
-            ["collidable"] = true,
             ["teleportable"] = true
           }
         },
@@ -507,7 +506,6 @@ return {
           rotation = 0,
           visible = true,
           properties = {
-            ["collidable"] = true,
             ["teleportable"] = true
           }
         }
@@ -517,7 +515,7 @@ return {
       type = "objectgroup",
       name = "traps",
       visible = true,
-      opacity = 1,
+      opacity = 0,
       offsetx = 0,
       offsety = 0,
       draworder = "topdown",
@@ -532,6 +530,58 @@ return {
           y = 800,
           width = 608,
           height = 32,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 37,
+          name = "spike",
+          type = "trap",
+          shape = "rectangle",
+          x = 928,
+          y = 240,
+          width = 16,
+          height = 16,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 39,
+          name = "spike",
+          type = "trap",
+          shape = "rectangle",
+          x = 944,
+          y = 240,
+          width = 16,
+          height = 16,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 40,
+          name = "spike",
+          type = "trap",
+          shape = "rectangle",
+          x = 960,
+          y = 240,
+          width = 16,
+          height = 16,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 41,
+          name = "spike",
+          type = "trap",
+          shape = "rectangle",
+          x = 976,
+          y = 240,
+          width = 16,
+          height = 16,
           rotation = 0,
           visible = true,
           properties = {}

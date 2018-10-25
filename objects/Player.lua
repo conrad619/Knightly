@@ -3,7 +3,7 @@ local Weapon = require 'objects.Weapon'
 local Entity = OBJECTS.entity
 local anim = LIBS.anim
 local Player = Entity:extend()
-function Player:new(world,x,y)
+function Player:new(world,x,y,wep)
 	self.img = IMG.player
   self.animation = {}
   self.load = function()
@@ -21,6 +21,8 @@ function Player:new(world,x,y)
 	Player.super.new(self,world,x,y,self.w,self.h)
   self.offsetx = 8
   self.offsety = 16
+  self.offx = 8
+  self.offy = 4
   self.originx=0
   self.originy=0
 	self.vx=0
@@ -32,7 +34,7 @@ function Player:new(world,x,y)
 
 	self.isJumping=false
 
-  self.health=100
+  self.health=300
 
   self.knockback = 200
 
@@ -45,6 +47,8 @@ function Player:new(world,x,y)
 
   self.invul=false
 
+  self.checkPoint={}
+
   self.state = 'idle'
 	self.world:add(self,self:getRect())
 
@@ -52,11 +56,6 @@ function Player:new(world,x,y)
   self.type="Player"
   self.collisionFilter = function(item,other)
     local x,y,w,h = self.world:getRect(other)
-    if other.properties then
-      if other.properties.teleportable then
-        return 'cross'
-      end
-    end
     if other.properties and other.properties.collidable then
         return 'slide'
     end
@@ -80,9 +79,10 @@ function Player:new(world,x,y)
       return 'cross'
     end
 
-
-  self.weapon = Weapon(self.world, self)
-
+  self.wep=wep
+  self.weapon = Weapon(self.world, self,self.wep)
+  self.enemy="Enemy"
+  self.weapon.hitbox:setEnemy(self.enemy)
   self.compo = {self,self.weapon,self.weapon.hitbox}
 end
 
@@ -124,7 +124,6 @@ function Player:update(dt)
 	local len = 0
   local tempx = self.x
   local tempy = self.y
-
   self.x, self.y, cols, len = self.world:move(self,goalx,goaly,self.collisionFilter)
   _, _, _, _=self.world:check(self,goalx,self.y+8,self.jumpFilter)
 
@@ -135,6 +134,7 @@ function Player:update(dt)
   end
   
   self.animation[self.animc]:update(dt)
+  if self.vx == 0 then
   if tempx > self.x then
     self.state = 'moveLeft'
     self:faceLeft()
@@ -148,10 +148,16 @@ function Player:update(dt)
   if math.abs(self.vy) > 0 then
     self.state='jumping'
   end
+  end
   
   self:State()
   self.originx = self.x + self.offsetx
   self.originy = self.y + self.offsety
+
+  local comp = self:components()
+  for i=2, #comp do
+    comp[i]:update(dt)
+  end
 end
 
 
@@ -195,8 +201,8 @@ function Player:draw()
     love.graphics.setColor(255,255,255)
   end
   --love.graphics.draw(self.img,self.x,self.y)
-  self.animation[self.animc]:draw(self.img, self.x, self.y,0,1,1,self.offsetx,4)
-  --love.graphics.rectangle("line",self.x,self.y,self.w,self.h)
+  self.animation[self.animc]:draw(self.img, self.x, self.y,0,1,1,self.offx,self.offy)
+  --love.graphics.rectangle("line",self:getRect())
   --love.graphics.rectangle("line",self.originx,self.originy,3,100)
 
   if self.blinkRed then
@@ -205,6 +211,14 @@ function Player:draw()
     love.graphics.setColor(255,255,255)
   end
   --love.graphics.rectangle("line",self.x,self.y,self.w-30,self.h-30)
+  local comp = self:components()
+  for i=2, #comp do
+    comp[i]:draw()
+  end
+
+  love.graphics.setColor(.3,0,.7)
+  love.graphics.rectangle("fill",self.x-10*10/2+self.offsetx,self.y-32,(self.health/300)*(10*10),10)
+  love.graphics.setColor(255,255,255)
   
 end
 
@@ -254,5 +268,17 @@ function Player:damage(damage,source)
     :after(function() self.invul=false end ,delay)
   end
 end
+
+function Player:respawn()
+  local x,y
+  x = self.checkPoint[1]
+  y = self.checkPoint[2]
+  print(x)
+  print(y)
+  self.world:update(self,x,y)
+  self.x = x
+  self.y = y
+end
+
 
 return Player

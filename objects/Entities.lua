@@ -31,6 +31,20 @@ function Entities:remove(entity)
 	end
 end
 
+function Entities:swapOrder(entity1,entity2)
+	local temp1 = entity1
+	local temp2 = entity2
+	for i, e in ipairs(self.entityList) do
+		if e == entity1 then
+			self.entityList[i]=temp2			
+		end
+		if e == entity2 then
+			self.entityList[i]=temp1
+		end
+	end
+
+end
+
 function Entities:removeAt(index)
 	table.remove(self.entityList, index)
 end

@@ -20,7 +20,7 @@ local gate2=nil
 ENTITIES={}
 
 function gameLevel2:new()
-    gameLevel2.super.new(self,'levels/level_2.lua')
+    gameLevel2.super.new(self,'levels/level_3.lua')
     
 end
 
@@ -45,8 +45,11 @@ function gameLevel2:enter()
       player.x=p.x
       player.y=p.y
       self.Entities:add(player)
-    elseif p.name == "spawn_enemy" then
-      enemy = Enemy(self.world, p.x,p.y, player,love.math.random(1,2))
+    elseif p.name == "spawn_enemy_s" then
+      enemy = Enemy(self.world, p.x,p.y, player,1)
+      self.Entities:add(enemy)
+      elseif p.name == "spawn_enemy_a" then
+      enemy = Enemy(self.world, p.x,p.y, player,2)
       self.Entities:add(enemy)
     elseif p.name == "door_level_1" then
       gate = Gate(self.world,p.x,p.y)

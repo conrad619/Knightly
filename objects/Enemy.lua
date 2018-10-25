@@ -4,7 +4,7 @@ local Weapon = require 'objects.Weapon'
 local anim = LIBS.anim
 local Enemy = Entity:extend()
 
-function Enemy:new(world,x,y,target)
+function Enemy:new(world,x,y,target,wep)
 	self.img = IMG.enemy
   	self.animation = {}
 	self.load = function()
@@ -18,7 +18,7 @@ function Enemy:new(world,x,y,target)
   self.loaded=false
 
 	self.w=16
-	self.h=32
+	self.h=28
 	Enemy.super.new(self,world,x,y,self.w,self.h)
 	self.target = target
 	self.vx=0
@@ -40,6 +40,8 @@ function Enemy:new(world,x,y,target)
 
 	self.offsetx = 8
 	self.offsety = 16
+	self.offx = 8
+	self.offy = 4
 	self.originx = 0
 	self.originy = 0
 
@@ -70,8 +72,9 @@ function Enemy:new(world,x,y,target)
 
 
 
-  self.weapon = Weapon(self.world, self)
-  self.weapon.hitbox:setEnemy("Player")
+  self.weapon = Weapon(self.world, self,wep)
+  self.enemy = "Player"
+  self.weapon.hitbox:setEnemy(self.enemy)
 
   self.compo = {self,self.weapon,self.weapon.hitbox}
 
@@ -92,7 +95,8 @@ function Enemy:update(dt)
 	elseif self.target.x-16 > self.x and self.target.y <= self.y then
 		goalx=self.x+self.speed*dt
 	end--]]
-	if math.abs(self.target.x - self.x) < 32*4 and math.abs(self.target.x - self.x) > 32 and math.abs(self.target.y-self.y) < 64 then
+
+	if math.abs(self.target.x - self.x) < self.weapon.rangeChase and math.abs(self.target.x - self.x) > 32 and math.abs(self.target.y-self.y) < 64 then
 		if self.target.x > self.x then
 			goalx=self.x+self.speed*dt
 		elseif self.target.x < self.x then
@@ -104,9 +108,16 @@ function Enemy:update(dt)
 	end
 
 
-	if math.abs(self.target.x - self.x) < 64 and math.abs(self.target.y-self.y) < 64 then
+	if math.abs(self.target.x - self.x) < self.weapon.range and math.abs(self.target.y-self.y) < 32 then
 		if self.target.y-32 <= self.y and self.canAttack then
 			self.canAttack=false
+			if self.target.x < self.x then
+				self.state = "moveLeft"
+				self:faceLeft()
+			elseif self.target.x > self.x then
+				self.state = "moveRight"
+				self:faceRight()
+			end
 			LIBS.tick.delay(function()  self.weapon:attack() end,.5)	
 
 			LIBS.tick.delay(function()  self.canAttack=true end,1.5)			
@@ -136,7 +147,7 @@ function Enemy:update(dt)
     end
 	
 	self.x, self.y, cols, len = self.world:move(self,goalx,goaly,self.collisionFilter)
-  	_, _, _, _=self.world:check(self,goalx,self.y+16,jumpFilter)
+  	_, _, _, _=self.world:check(self,goalx,self.y+8,jumpFilter)
 	for i, col in ipairs(cols) do
 		if col.other.type=="Enemy" then
 		  if self.x < col.other.x then
@@ -177,6 +188,10 @@ function Enemy:update(dt)
 	self.originx = self.x + self.offsetx
 	self.originy = self.y + self.offsety
 
+	local comp = self:components()
+	for i=2, #comp do
+		comp[i]:update(dt)
+	end
 end
 
 function Enemy:State()
@@ -220,8 +235,13 @@ function Enemy:draw()
   	else
   		love.graphics.setColor(255,255,255)
   	end
-  	self.animation[self.animc]:draw(self.img, self.x, self.y,0,1,1,self.offsetx,0)
+  	self.animation[self.animc]:draw(self.img, self.x, self.y,0,1,1,self.offx,self.offy)
 	love.graphics.setColor(255,255,255)
+
+	local comp = self:components()
+	for i=2, #comp do
+		comp[i]:draw()
+	end
   
 end
 
